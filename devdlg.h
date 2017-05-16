@@ -8,7 +8,7 @@
 #include <regstr.h>
 #include <shlwapi.h>
 #include <Rpcdce.h>
-
+#include <Usbiodef.h>
 #include <driver.h>
 
 #define MAX_LEN 1024
@@ -29,7 +29,7 @@ public:
 
     bool devValid();
     int getDevIndex();
-    QString getSelectedPdoName();
+    void getSelectedPdoName(char *buf, int *len);
 
 private slots:
     void selectItem(QListWidgetItem *item);
@@ -41,7 +41,8 @@ private:
 
     //HDEVINFO hDevInfo;
     GUID guid;
-    QString devName;
+    char *devName;
+    int nameLen;
     bool validFlag;
 
     void EnumDevs();

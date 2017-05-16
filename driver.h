@@ -31,6 +31,13 @@
             METHOD_BUFFERED, \
             FILE_ANY_ACCESS)
 
+#define IOCTL_SENDDATA_FLAG \
+    CTL_CODE(\
+            FILE_DEVICE_UNKNOWN,\
+            0X826,\
+            METHOD_BUFFERED, \
+            FILE_ANY_ACCESS)
+
 typedef struct {
     ULONG TranferFlags;
     ULONG Len;

@@ -31,6 +31,8 @@ void MainWindow::on_selectDevBtn_clicked()
     //ui->selectDevBtn->setEnabled(false);
 
     devDlg *dlg = new devDlg;
+    char *pdo_name = (char *)malloc(MAX_LEN);
+    int len = 0;
     dlg->show();
 
 
@@ -41,12 +43,16 @@ void MainWindow::on_selectDevBtn_clicked()
         {
             //ui->selectDevBtn->setEnabled(false);
 
-            if(findFilter(dlg->getSelectedPdoName()))
+            dlg->getSelectedPdoName(pdo_name, &len);
+            /*
+            if(findFilter(pdo_name, len))
                 ui->capBtn->setEnabled(true);
             else
                 QMessageBox::warning(this, tr("warn!"), tr("Can't capture this device!"),QMessageBox::Yes);
+            */
         }
     }
+    free(pdo_name);
 }
 
 void MainWindow::on_capBtn_clicked()
@@ -59,7 +65,7 @@ void MainWindow::on_capBtn_clicked()
         ui->capBtn->setText("Stop Capture");
         ui->selectDevBtn->setEnabled(false);
 
-        if (handle_thread->openDevice())
+        if (!handle_thread->openDevice())
         {
            QMessageBox::warning(this, tr("warn!"),tr("打开设备失败!"),QMessageBox::Yes);
            ui->statusBar->showMessage(tr("Open failed."), 2000);
@@ -155,21 +161,34 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 
 }
 
-bool MainWindow::findFilter(QString pdoName)
+bool MainWindow::findFilter(char *pdoName, int len)
 {
-    char* pdo;
-    DWORD strlen = 0;
+    //qDebug() << len;
+    //qDebug("%c", pdoName[len-2]);
 
-    pdo = (char *)qPrintable(pdoName);
-    strlen = pdoName.length();
     if(handle_thread->openDevice())
     {
-        if(handle_thread->findFilter(pdo, strlen))
+        if(handle_thread->findFilter(pdoName, (DWORD)len))
         {
             handle_thread->closeDevice();
             return true;
         }
+        handle_thread->closeDevice();
     }
+
     return false;
+
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    QString len = ui->lenInput->text();
+    QString data = ui->dataInput->text();
+    if(len.isEmpty() || data.isEmpty())
+    {
+        QMessageBox::warning(this, tr("warn!"), tr("input length and data!"),QMessageBox::Yes);
+        return;
+    }
+    //qDebug() << len << '\t' << data.length();
 
 }

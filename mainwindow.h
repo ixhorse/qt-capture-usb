@@ -27,6 +27,8 @@ private slots:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     Thread *handle_thread;
@@ -34,7 +36,7 @@ private:
 
     void initTableWidget();
     void initStatusBar();
-    bool findFilter(QString pdoName);
+    bool findFilter(char *pdoName, int len);
 };
 
 #endif // MAINWINDOW_H

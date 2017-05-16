@@ -10,6 +10,8 @@ devDlg::devDlg(QWidget *parent) :
     guid = GUID(Qguid);
     validFlag = false;
     selectedIndex = -1;
+    devName = NULL;
+    nameLen = 0;
 
 
     ui->setupUi(this);
@@ -47,10 +49,12 @@ void devDlg::EnumDevs()
     //clear list
     ui->listWidget->clear();
 
+    guid = GUID(QUuid("{A5DCBF10-6530-11D2-901F-00C04FB951ED}"));
     hDevInfo = SetupDiGetClassDevs(&guid,
                                     0,        // Enumerator
                                     0,
-                                   DIGCF_PRESENT);
+                                   DIGCF_PRESENT |
+                                   DIGCF_DEVICEINTERFACE);
     if (hDevInfo == INVALID_HANDLE_VALUE)
     {
         // Insert error handling here.
@@ -158,6 +162,8 @@ void devDlg::on_okBtn_clicked()
         char buffer[MAX_LEN] = {0};
         ULONG requiredLength = 0;
         ULONG predictedLength = 0;
+        if(devName != NULL)
+            free(devName);
 
         SetupDiGetDeviceRegistryProperty(hDevInfo,
                                          &DeviceInfoData,
@@ -175,7 +181,9 @@ void devDlg::on_okBtn_clicked()
                                          predictedLength,
                                          &requiredLength))
         {
-            devName = QString::fromLocal8Bit (buffer, predictedLength);
+            devName = (char *)malloc(sizeof(char)*predictedLength);
+            memcpy(devName, buffer, predictedLength);
+            nameLen = predictedLength;
             //qDebug() << QByteArray(buffer, predictedLength);
             //QMessageBox::warning(this, tr("warn!"),devName,QMessageBox::Yes);
 
@@ -195,7 +203,9 @@ int devDlg::getDevIndex()
     return selectedIndex;
 }
 
-QString devDlg::getSelectedPdoName()
+void devDlg::getSelectedPdoName(char *buf, int *len)
 {
-    return devName;
+    *len = nameLen;
+    memcpy(buf, devName, nameLen);
+    free(devName);
 }

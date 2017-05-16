@@ -36,7 +36,7 @@ void Thread::run()
 
             temp.clear();
             for(i=0; i<list_node.Bulk_in.Len; i++)
-                temp.append(QString("%1").arg(list_node.Bulk_in.Buf[i]));
+                temp.append(QString("%c").arg(list_node.Bulk_in.Buf[i]));
             data << temp;
         }
         else
@@ -99,8 +99,9 @@ bool Thread::findFilter(char *pdo_name, DWORD len)
 
     if(hDevice)
     {
-        DeviceIoControl(hDevice, IOCTL_FINDFLT_FLAG, pdo_name, len, &find_flag, 1, &dRet, 0);
+        DeviceIoControl(hDevice, IOCTL_FINDFLT_FLAG, pdo_name, len, &find_flag, sizeof(int), &dRet, 0);
         if(find_flag)
             return true;
     }
+    return false;
 }

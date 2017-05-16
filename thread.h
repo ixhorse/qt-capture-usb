@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <QDebug>
 #include "driver.h"
 
 class Thread : public QThread
