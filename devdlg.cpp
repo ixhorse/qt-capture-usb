@@ -6,7 +6,7 @@ devDlg::devDlg(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::devDlg)
 {
-    QUuid Qguid = QUuid("{36fc9e60-c465-11cf-8056-444553540000}");
+    QUuid Qguid = QUuid("{A5DCBF10-6530-11D2-901F-00C04FB951ED}");
     guid = GUID(Qguid);
     validFlag = false;
     selectedIndex = -1;
@@ -99,28 +99,30 @@ void devDlg::EnumDevs()
 
 void devDlg::on_okBtn_clicked()
 {
-    int index = selectedIndex;
-    //int i;
-    SP_DEVINFO_DATA DeviceInfoData;
-    HDEVINFO hDevInfo;
+    int                                 index = selectedIndex;
+    int                                 i;
+    SP_DEVINFO_DATA                     DeviceInfoData;
+    HDEVINFO                            hDevInfo;
+    SP_DEVICE_INTERFACE_DATA            DeviceItfcData;
+    PSP_DEVICE_INTERFACE_DETAIL_DATA    InterfaceDetailData;
+    ULONG                               requiredLength = 0;
+    ULONG                               predictedLength = 0;
+
+    validFlag = false;
 
     hDevInfo = SetupDiGetClassDevs(&guid,
-            0,        // Enumerator
-            0,
-            DIGCF_PRESENT);
+                                    0,        // Enumerator
+                                    0,
+                                    DIGCF_PRESENT |
+                                   DIGCF_DEVICEINTERFACE);
 
     DeviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
     if(SetupDiEnumDeviceInfo(hDevInfo,
                              index,
                              &DeviceInfoData))
     {
-        /*for(i=0; ;i++)
+        for(i=0; ;i++)
         {
-            SP_DEVICE_INTERFACE_DATA DeviceItfcData;
-            SP_DEVICE_INTERFACE_DETAIL_DATA InterfaceDetailData;
-            ULONG requiredLength = 0;
-            ULONG predictedLength = 0;
-
             DeviceItfcData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
             SetupDiEnumDeviceInterfaces (hDevInfo,
                                     0,
@@ -129,6 +131,7 @@ void devDlg::on_okBtn_clicked()
                                     &DeviceItfcData);
             if (ERROR_NO_MORE_ITEMS == GetLastError())
             {
+                SetupDiDestroyDeviceInfoList(hDevInfo);
                 break;
             }
 
@@ -141,24 +144,30 @@ void devDlg::on_okBtn_clicked()
                    NULL); // not interested in the specific dev-node
 
             predictedLength = requiredLength;
+            InterfaceDetailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)LocalAlloc(LPTR, requiredLength);
+            InterfaceDetailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
-            InterfaceDetailData.cbSize = predictedLength;
-
-            if (! SetupDiGetDeviceInterfaceDetail (
+            if (SetupDiGetDeviceInterfaceDetail (
                            hDevInfo,
                            &DeviceItfcData,
-                           &InterfaceDetailData,
+                           InterfaceDetailData,
                            predictedLength,
                            &requiredLength,
                            NULL)) {
-
+                devName = (char *)malloc(predictedLength);
+                memcpy(devName, InterfaceDetailData->DevicePath, predictedLength);
             }
-
-            wcsncpy(devName, InterfaceDetailData.DevicePath, predictedLength);
-            qDebug() << QString::fromUtf8((LPSTR)InterfaceDetailData.DevicePath, predictedLength);
+            else
+            {
+                SetupDiDestroyDeviceInfoList(hDevInfo);
+                return;
+            }
+            validFlag = true;
+            nameLen = predictedLength;
+            LocalFree(InterfaceDetailData);
         }
-        */
 
+        /*
         char buffer[MAX_LEN] = {0};
         ULONG requiredLength = 0;
         ULONG predictedLength = 0;
@@ -181,7 +190,7 @@ void devDlg::on_okBtn_clicked()
                                          predictedLength,
                                          &requiredLength))
         {
-            devName = (char *)malloc(sizeof(char)*predictedLength);
+            c
             memcpy(devName, buffer, predictedLength);
             nameLen = predictedLength;
             //qDebug() << QByteArray(buffer, predictedLength);
@@ -189,7 +198,7 @@ void devDlg::on_okBtn_clicked()
 
             validFlag = true;
         }
-
+        */
     }
 }
 

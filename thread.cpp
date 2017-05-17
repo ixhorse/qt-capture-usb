@@ -24,7 +24,7 @@ void Thread::run()
         mutex.lock();
 
         data.clear();
-        ReadFile(hDevice, &list_node, sizeof(LIST_NODE), &dRet, NULL);
+        DeviceIoControl(hDevice, IOCTL_READ_LIST, &list_node, sizeof(LIST_NODE), NULL, 0, &dRet, NULL);
         if(dRet > 0)
         {
             temp.clear();
@@ -52,9 +52,9 @@ void Thread::run()
     stoped=false;
 }
 
-bool Thread::openDevice()
+bool Thread::openDevice(char *devName)
 {
-    hDevice =CreateFile(L"\\\\.\\LineDevice",
+    hDevice =CreateFile((LPCTSTR)devName,
                         GENERIC_READ | GENERIC_WRITE,
                         0,		// share mode none
                         NULL,	// no security
@@ -99,7 +99,7 @@ bool Thread::findFilter(char *pdo_name, DWORD len)
 
     if(hDevice)
     {
-        DeviceIoControl(hDevice, IOCTL_FINDFLT_FLAG, pdo_name, len, &find_flag, sizeof(int), &dRet, 0);
+        DeviceIoControl(hDevice, IOCTL_FIND_FILTER, pdo_name, len, &find_flag, sizeof(int), &dRet, 0);
         if(find_flag)
             return true;
     }

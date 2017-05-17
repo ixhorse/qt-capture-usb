@@ -17,7 +17,7 @@ public:
 
     void stop();
     //HANDLE getHandle();
-    bool openDevice();
+    bool openDevice(char *devName);
     void setCapFlag();
     void clearCapFlag();
     void closeDevice();

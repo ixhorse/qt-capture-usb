@@ -24,14 +24,14 @@
             METHOD_BUFFERED, \
             FILE_ANY_ACCESS)
 
-#define IOCTL_FINDFLT_FLAG \
+#define IOCTL_FIND_FILTER \
     CTL_CODE(\
             FILE_DEVICE_UNKNOWN,\
             0X825,\
             METHOD_BUFFERED, \
             FILE_ANY_ACCESS)
 
-#define IOCTL_SENDDATA_FLAG \
+#define IOCTL_SEND_DATA \
     CTL_CODE(\
             FILE_DEVICE_UNKNOWN,\
             0X826,\

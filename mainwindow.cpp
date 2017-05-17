@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->initTableWidget();
     this->initStatusBar();
 
+    devName = NULL;
+
     ui->capBtn->setText("Start Capture");
     ui->capBtn->setEnabled(false);
     ui->selectDevBtn->setEnabled(true);
@@ -30,12 +32,17 @@ void MainWindow::on_selectDevBtn_clicked()
 {
     //ui->selectDevBtn->setEnabled(false);
 
-    devDlg *dlg = new devDlg;
-    char *pdo_name = (char *)malloc(MAX_LEN);
-    int len = 0;
+    devDlg      *dlg = new devDlg;
+    int         len = 0;
+    DWORD       dRet = 0;
+    HANDLE      hDevice;
+    PVOID       p;
+
     dlg->show();
 
-
+    if(devName)
+        free(devName);
+    devName = (char *)malloc(MAX_LEN);
     if(dlg->exec() == QDialog::Accepted)
     {
         //QMessageBox::warning(this, tr("warn!"),QString::number(dlg->selectedIndex),QMessageBox::Yes);
@@ -43,16 +50,41 @@ void MainWindow::on_selectDevBtn_clicked()
         {
             //ui->selectDevBtn->setEnabled(false);
 
-            dlg->getSelectedPdoName(pdo_name, &len);
+            dlg->getSelectedPdoName(devName, &len);
             /*
             if(findFilter(pdo_name, len))
                 ui->capBtn->setEnabled(true);
             else
                 QMessageBox::warning(this, tr("warn!"), tr("Can't capture this device!"),QMessageBox::Yes);
             */
+
+            hDevice = CreateFile((LPCTSTR)devName,
+                                 GENERIC_READ | GENERIC_WRITE,
+                                 0,		// share mode none
+                                 NULL,	// no security
+                                 OPEN_EXISTING,
+                                 FILE_ATTRIBUTE_NORMAL,
+                                 NULL);
+             if (hDevice == INVALID_HANDLE_VALUE)
+             {
+                 QMessageBox::warning(this, tr("warn!"), tr("Can't capture this device!"),QMessageBox::Yes);
+                 return;
+             }
+
+             DeviceIoControl(hDevice, IOCTL_FIND_FILTER, NULL, 0, &p, 4, &dRet, 0);
+             if(dRet != sizeof(PVOID))
+             {
+                 QMessageBox::warning(this, tr("warn!"), tr("Can't capture this device!"),QMessageBox::Yes);
+                 CloseHandle(hDevice);
+                 return;
+             }
+             qDebug() << dRet;
+
+             ui->capBtn->setEnabled(true);
+             CloseHandle(hDevice);
         }
     }
-    free(pdo_name);
+
 }
 
 void MainWindow::on_capBtn_clicked()
@@ -65,7 +97,7 @@ void MainWindow::on_capBtn_clicked()
         ui->capBtn->setText("Stop Capture");
         ui->selectDevBtn->setEnabled(false);
 
-        if (!handle_thread->openDevice())
+        if (!handle_thread->openDevice(devName))
         {
            QMessageBox::warning(this, tr("warn!"),tr("打开设备失败!"),QMessageBox::Yes);
            ui->statusBar->showMessage(tr("Open failed."), 2000);
@@ -166,7 +198,7 @@ bool MainWindow::findFilter(char *pdoName, int len)
     //qDebug() << len;
     //qDebug("%c", pdoName[len-2]);
 
-    if(handle_thread->openDevice())
+    if(handle_thread->openDevice(devName))
     {
         if(handle_thread->findFilter(pdoName, (DWORD)len))
         {
@@ -182,13 +214,31 @@ bool MainWindow::findFilter(char *pdoName, int len)
 
 void MainWindow::on_pushButton_clicked()
 {
-    QString len = ui->lenInput->text();
-    QString data = ui->dataInput->text();
+    HANDLE          hDevice;
+    DWORD           dRet = 0;
+    QString         len = ui->lenInput->text();
+    QString         data = ui->dataInput->text();
     if(len.isEmpty() || data.isEmpty())
     {
         QMessageBox::warning(this, tr("warn!"), tr("input length and data!"),QMessageBox::Yes);
         return;
     }
-    //qDebug() << len << '\t' << data.length();
+
+    hDevice = CreateFile((LPCTSTR)devName,
+                     GENERIC_READ | GENERIC_WRITE,
+                     0,		// share mode none
+                     NULL,	// no security
+                     OPEN_EXISTING,
+                     FILE_ATTRIBUTE_NORMAL,
+                     NULL);
+    if (hDevice == INVALID_HANDLE_VALUE)
+    {
+         //QMessageBox::warning(this, tr("warn!"), tr("Can't capture this device!"),QMessageBox::Yes);
+         return;
+    }
+
+    DeviceIoControl(hDevice, IOCTL_SEND_DATA, data.toLatin1().data(), len.toInt(), NULL, 0, &dRet, 0);
+
+    CloseHandle(hDevice);
 
 }

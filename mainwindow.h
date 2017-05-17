@@ -33,6 +33,7 @@ private:
     Ui::MainWindow *ui;
     Thread *handle_thread;
     QLabel *statusLabel;
+    char *devName;
 
     void initTableWidget();
     void initStatusBar();
