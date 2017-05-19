@@ -4,6 +4,7 @@
 
 #include <qmessagebox.h>
 #include <qtextstream.h>
+#include <winusb.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -34,9 +35,11 @@ void MainWindow::on_selectDevBtn_clicked()
 
     devDlg      *dlg = new devDlg;
     int         len = 0;
+    int         sz = 1;
     DWORD       dRet = 0;
     HANDLE      hDevice;
     PVOID       p;
+    WINUSB_INTERFACE_HANDLE Interface;
 
     dlg->show();
 
@@ -63,7 +66,7 @@ void MainWindow::on_selectDevBtn_clicked()
                                  0,		// share mode none
                                  NULL,	// no security
                                  OPEN_EXISTING,
-                                 FILE_ATTRIBUTE_NORMAL,
+                                 FILE_FLAG_OVERLAPPED,
                                  NULL);
              if (hDevice == INVALID_HANDLE_VALUE)
              {
@@ -81,6 +84,9 @@ void MainWindow::on_selectDevBtn_clicked()
              qDebug() << dRet;
 
              ui->capBtn->setEnabled(true);
+
+             //Interface = (PWINUSB_INTERFACE_HANDLE)LocalAlloc(LPTR, sizeof(WINUSB_INTERFACE_HANDLE) * sz);
+             LocalFree(Interface);
              CloseHandle(hDevice);
         }
     }

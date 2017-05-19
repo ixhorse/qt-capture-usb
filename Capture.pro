@@ -6,6 +6,7 @@
 
 QT       += core gui
 win32: LIBS += -lSetupApi
+win32: LIBS += -lWinusb
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

@@ -24,11 +24,11 @@ void Thread::run()
         mutex.lock();
 
         data.clear();
-        DeviceIoControl(hDevice, IOCTL_READ_LIST, &list_node, sizeof(LIST_NODE), NULL, 0, &dRet, NULL);
+        DeviceIoControl(hDevice, IOCTL_READ_LIST, NULL, 0, &list_node, sizeof(LIST_NODE), &dRet, NULL);
         if(dRet > 0)
         {
             temp.clear();
-            for(i=0; i<list_node.Bulk_out.Len; i++)
+            for(i=0; i<list_node.Bulk_in.Len; i++)
                 //QTextStream(temp) << list_node.Bulk_out.Buf[i];
                 //temp.append(QString("%1").arg(list_node.Bulk_out.Buf[i]));
                 temp.append(QString("").sprintf("%02x ",list_node.Bulk_out.Buf[i]));
@@ -36,7 +36,7 @@ void Thread::run()
 
             temp.clear();
             for(i=0; i<list_node.Bulk_in.Len; i++)
-                temp.append(QString("%c").arg(list_node.Bulk_in.Buf[i]));
+                temp.append(QString("%1").arg((char)list_node.Bulk_in.Buf[i]));
             data << temp;
         }
         else
