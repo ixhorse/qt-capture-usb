@@ -27,15 +27,22 @@ private slots:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
-    void on_pushButton_clicked();
+    void on_sendButton_clicked();
+
+    void on_clearButton_clicked();
+
+    void pipeSelect(QTableWidgetItem *item);
 
 private:
     Ui::MainWindow *ui;
     Thread *handle_thread;
     QLabel *statusLabel;
     char *devName;
+    PPIPE_INFO  pipe_info;
 
     void initTableWidget();
+    void initPipeTable();
+    void setPipeTable(PPIPE_INFO pipeInfo, int pipeNums);
     void initStatusBar();
     bool findFilter(char *pdoName, int len);
 };
