@@ -36,7 +36,7 @@ void Thread::run()
 
             temp.clear();
             for(i=0; i<list_node.Bulk_in.Len; i++)
-                temp.append(QString("%1").arg((char)list_node.Bulk_in.Buf[i]));
+                temp.append(QString("").sprintf("%02x ",list_node.Bulk_in.Buf[i]));
             data << temp;
         }
         else
@@ -47,7 +47,7 @@ void Thread::run()
         emit listInfo(data);
 
         mutex.unlock();
-        msleep(1);
+        usleep(100);
     }
     stoped=false;
 }

@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->capBtn->setEnabled(false);
     ui->selectDevBtn->setEnabled(true);
     ui->sendButton->setEnabled(false);
+    ui->clearButton->setEnabled(false);
 
     handle_thread = new Thread;
     connect(handle_thread,SIGNAL(listInfo(QStringList)),this,SLOT(showList(QStringList)));
@@ -110,6 +111,7 @@ void MainWindow::on_capBtn_clicked()
     {
         ui->capBtn->setText("Stop Capture");
         ui->selectDevBtn->setEnabled(false);
+        ui->clearButton->setEnabled(false);
 
         if (!handle_thread->openDevice(devName))
         {
@@ -133,6 +135,7 @@ void MainWindow::on_capBtn_clicked()
 
         ui->capBtn->setText("Start Capture");
         ui->selectDevBtn->setEnabled(true);
+        ui->clearButton->setEnabled(true);
         statusLabel->clear();
     }
 }
@@ -141,7 +144,7 @@ void MainWindow::showList(QStringList data)
 {
     int row = ui->tableWidget->rowCount();
     QTableWidgetItem *itemNum = new QTableWidgetItem(QString::number(row+1));
-    QTableWidgetItem *itemType = new QTableWidgetItem(QString("Bulk/Interpt:out"));
+    QTableWidgetItem *itemType = new QTableWidgetItem(QString("Bulk/Interpt"));
     QTableWidgetItem *itemHex = new QTableWidgetItem(data.at(0));
     QTableWidgetItem *itemDec = new QTableWidgetItem(data.at(1));
 
@@ -167,7 +170,7 @@ void MainWindow::initTableWidget(){
     ui->tableWidget->verticalHeader()->setDefaultSectionSize(25);
 
     QStringList headText;
-    headText << "num" << "Type" << "Hex" << "Dec";
+    headText << "num" << "Type" << "Out" << "In";
     ui->tableWidget->setHorizontalHeaderLabels(headText);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -362,7 +365,7 @@ void MainWindow::setPipeTable(PPIPE_INFO pipeInfo, int pipeNums)
 
 void MainWindow::on_clearButton_clicked()
 {
-    ui->tableWidget->clear();
+    ui->tableWidget->setRowCount(0);
 }
 
 void MainWindow::pipeSelect(QTableWidgetItem *item)
