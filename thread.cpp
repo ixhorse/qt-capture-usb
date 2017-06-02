@@ -41,13 +41,14 @@ void Thread::run()
         }
         else
         {
-            data << "empty" << "empty";
-            msleep(1000);
+            msleep(100);
+            mutex.unlock();
+            continue;
         }
         emit listInfo(data);
 
         mutex.unlock();
-        usleep(100);
+        usleep(10);
     }
     stoped=false;
 }

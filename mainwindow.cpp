@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     devName = NULL;
 
-    ui->capBtn->setText("Start Capture");
+    ui->capBtn->setText("开始捕获");
     ui->capBtn->setEnabled(false);
     ui->selectDevBtn->setEnabled(true);
     ui->sendButton->setEnabled(false);
@@ -66,7 +66,7 @@ void MainWindow::on_selectDevBtn_clicked()
                                  NULL);
              if (hDevice == INVALID_HANDLE_VALUE)
              {
-                 QMessageBox::warning(this, tr("warn!"), tr("Can't capture this device!"),QMessageBox::Yes);
+                 QMessageBox::warning(this, "warn!", "Can't capture this device!",QMessageBox::Yes);
                  ui->capBtn->setEnabled(false);
                  ui->sendButton->setEnabled(false);
                  return;
@@ -80,7 +80,7 @@ void MainWindow::on_selectDevBtn_clicked()
 
              if(dRet <= 0)
              {
-                 QMessageBox::warning(this, tr("warn!"), tr("IOCTL_FIND_FILTER failed!"),QMessageBox::Yes);
+                 QMessageBox::warning(this, "warn!", "IOCTL_FIND_FILTER failed!",QMessageBox::Yes);
                  CloseHandle(hDevice);
                  ui->capBtn->setEnabled(false);
                  ui->sendButton->setEnabled(false);
@@ -107,20 +107,20 @@ void MainWindow::on_capBtn_clicked()
     DWORD dRet;
     QString str;
 
-    if(ui->capBtn->text() == "Start Capture")
+    if(ui->capBtn->text() == "开始捕获")
     {
-        ui->capBtn->setText("Stop Capture");
+        ui->capBtn->setText("停止捕获");
         ui->selectDevBtn->setEnabled(false);
         ui->clearButton->setEnabled(false);
 
         if (!handle_thread->openDevice(devName))
         {
-           QMessageBox::warning(this, tr("warn!"),tr("打开设备失败!"),QMessageBox::Yes);
-           ui->statusBar->showMessage(tr("Open failed."), 2000);
+           QMessageBox::warning(this, "warn!","打开设备失败!",QMessageBox::Yes);
+           ui->statusBar->showMessage("Open failed.", 2000);
         }
         else
         {
-            ui->statusBar->showMessage(tr("Open success,start capture."), 2000);
+            ui->statusBar->showMessage("Open success,start capture.", 2000);
             statusLabel->setText("Ctrl+P to pause.");
 
             handle_thread->setCapFlag();
@@ -133,7 +133,7 @@ void MainWindow::on_capBtn_clicked()
         handle_thread->clearCapFlag();
         handle_thread->closeDevice();
 
-        ui->capBtn->setText("Start Capture");
+        ui->capBtn->setText("开始捕获");
         ui->selectDevBtn->setEnabled(true);
         ui->clearButton->setEnabled(true);
         statusLabel->clear();
@@ -170,7 +170,7 @@ void MainWindow::initTableWidget(){
     ui->tableWidget->verticalHeader()->setDefaultSectionSize(25);
 
     QStringList headText;
-    headText << "num" << "Type" << "Out" << "In";
+    headText << "序号" << "类别" << "输出数据" << "输入数据";
     ui->tableWidget->setHorizontalHeaderLabels(headText);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -242,7 +242,7 @@ void MainWindow::on_sendButton_clicked()
 
     if(len.isEmpty() || data.isEmpty())
     {
-        QMessageBox::warning(this, tr("warn!"), tr("input length and data!"),QMessageBox::Yes);
+        QMessageBox::warning(this, "warn!", "input length and data!",QMessageBox::Yes);
         return;
     }
 
@@ -255,7 +255,7 @@ void MainWindow::on_sendButton_clicked()
                      NULL);
     if (hDevice == INVALID_HANDLE_VALUE)
     {
-         //QMessageBox::warning(this, tr("warn!"), tr("Can't capture this device!"),QMessageBox::Yes);
+         //QMessageBox::warning(this, "warn!", "Can't capture this device!",QMessageBox::Yes);
          return;
     }
 
@@ -293,7 +293,7 @@ void MainWindow::initPipeTable()
     }
     ui->pipeTable->verticalHeader()->setDefaultSectionSize(25);
 
-    headText << "Endpoint" << "Type" << "Direction" << "Class" << "Subclass" << "Protocol" << "Max Packet";
+    headText << "端点" << "类别" << "方向" << "类" << "子类" << "协议" << "最大包长";
     ui->pipeTable->setHorizontalHeaderLabels(headText);
     ui->pipeTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->pipeTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -307,6 +307,7 @@ void MainWindow::initPipeTable()
 void MainWindow::setPipeTable(PPIPE_INFO pipeInfo, int pipeNums)
 {
     int i;
+    ui->pipeTable->setRowCount(0);
     QTableWidgetItem    *itemEndpoint,
                         *itemType,
                         *itemDirection,
@@ -325,13 +326,13 @@ void MainWindow::setPipeTable(PPIPE_INFO pipeInfo, int pipeNums)
         switch(pipeInfo[i].PipeType)
         {
         case Bulk:
-            itemType = new QTableWidgetItem(QString("Bulk"));
+            itemType = new QTableWidgetItem(QString("批量"));
             break;
         case Interrupt:
-            itemType = new QTableWidgetItem(QString("Interrupt"));
+            itemType = new QTableWidgetItem(QString("中断"));
             break;
         case Control:
-            itemType = new QTableWidgetItem(QString("Control"));
+            itemType = new QTableWidgetItem(QString("控制"));
             break;
         default:
             itemType = new QTableWidgetItem(QString("-"));

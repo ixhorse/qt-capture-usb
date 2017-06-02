@@ -34,7 +34,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Refresh</string>
+          <string>刷新</string>
          </property>
         </widget>
        </item>
@@ -47,7 +47,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>OK</string>
+          <string>确定</string>
          </property>
         </widget>
        </item>
@@ -60,7 +60,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Cancel</string>
+          <string>取消</string>
          </property>
         </widget>
        </item>

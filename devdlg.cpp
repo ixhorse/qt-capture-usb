@@ -89,7 +89,7 @@ void devDlg::EnumDevs()
             MAX_LEN,
             &buffersize))
         {
-            ui->listWidget->addItem(QString::fromUtf8(buffer, buffersize));
+            ui->listWidget->addItem(QString::fromWCharArray((WCHAR *)buffer, buffersize/2));
         }
     }
     if ( GetLastError()!=NO_ERROR && GetLastError()!=ERROR_NO_MORE_ITEMS )
