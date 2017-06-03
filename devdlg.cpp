@@ -123,9 +123,10 @@ void devDlg::on_okBtn_clicked()
     {
         for(i=0; ;i++)
         {
+            qDebug() << i;
             DeviceItfcData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
             SetupDiEnumDeviceInterfaces (hDevInfo,
-                                    0,
+                                    &DeviceInfoData,
                                     &guid,
                                     i,
                                     &DeviceItfcData);
@@ -156,6 +157,7 @@ void devDlg::on_okBtn_clicked()
                            NULL)) {
                 devName = (char *)malloc(predictedLength);
                 memcpy(devName, InterfaceDetailData->DevicePath, predictedLength);
+                qDebug() << QString::fromWCharArray((WCHAR*)devName, predictedLength/2-2);
             }
             else
             {

@@ -62,10 +62,11 @@ void MainWindow::on_selectDevBtn_clicked()
                                  0,		// share mode none
                                  NULL,	// no security
                                  OPEN_EXISTING,
-                                 FILE_FLAG_OVERLAPPED,
+                                 FILE_ATTRIBUTE_NORMAL,
                                  NULL);
              if (hDevice == INVALID_HANDLE_VALUE)
              {
+                 qDebug() << GetLastError();
                  QMessageBox::warning(this, "warn!", "Can't capture this device!",QMessageBox::Yes);
                  ui->capBtn->setEnabled(false);
                  ui->sendButton->setEnabled(false);
@@ -89,7 +90,7 @@ void MainWindow::on_selectDevBtn_clicked()
 
              pipeNums = dRet / sizeof(PIPE_INFO);
 
-             qDebug() << pipeNums;
+             //qDebug() << pipeNums;
 
              setPipeTable(pipe_info, pipeNums);
 
@@ -273,7 +274,7 @@ void MainWindow::on_sendButton_clicked()
         temp.clear();
         for(i=0; i<dRet; i++)
             temp.append(QString("%1 ").arg(buf[i], 2, 16, QLatin1Char('0')));
-        ui->dataInput->setText(temp);
+        ui->dataOutput->setText(temp);
     }
 
     CloseHandle(hDevice);

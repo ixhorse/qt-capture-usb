@@ -193,7 +193,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>输出数据</string>
+                  <string>输入数据</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
@@ -224,7 +224,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit"/>
+                <widget class="QLineEdit" name="dataOutput"/>
                </item>
               </layout>
              </item>
